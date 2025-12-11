@@ -8,7 +8,7 @@ export default defineConfig({
     // 'src/hooks/index.ts',
     // 'src/constants/index.ts',
   ],
-  format: ['esm'],
+  format: ['esm', 'cjs'],
   dts: {
     entry: 'src/index.ts',
     resolve: true,
