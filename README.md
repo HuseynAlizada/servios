@@ -11,20 +11,17 @@ Servios is a lightweight library providing essential building blocks for modern 
 ## ✨ Features
 
 ### HTTP Client
+
 - 🚀 **Zero-config** - Only `baseURL` required, everything else optional
 - 🔄 **Auto token refresh** - Handles 401 errors automatically
 - 🎭 **Mock support** - Built-in mock adapter for dev/testing
 - 🌐 **Smart URLs** - `{baseURL}/{serviceName}/{version}/{endpoint}`
-- 💾 **Token storage** - Cookie, localStorage, or sessionStorage
 
 ### React Query
+
 - ⚡ **Cache manager** - Optimistic updates for arrays, paginated data, single items
 - 🔑 **Multiple keys** - Update multiple caches at once
 - 📊 **CRUD support** - Create, update, delete with cache sync
-
-### Utilities
-- 📱 **Phone utils** - Format, validate, mask, parse phone numbers
-- 🔧 **More coming** - Date, string, number utilities
 
 ---
 
@@ -37,6 +34,7 @@ yarn add servios
 ```
 
 For React Query features:
+
 ```bash
 npm install @tanstack/react-query
 ```
@@ -155,20 +153,22 @@ configureBaseService({
 ```typescript
 interface TokenConfig {
   // Access token
-  tokenKey?: string;                 // Default: 'accessToken'
+  tokenKey?: string; // Default: 'accessToken'
   storage?: 'cookie' | 'localStorage' | 'sessionStorage'; // Default: 'cookie'
   cookieOptions?: {
-    path?: string;                   // Default: '/'
-    secure?: boolean;                // Default: true
-    expires?: number;                // Default: 7 days
+    path?: string; // Default: '/'
+    secure?: boolean; // Default: true
+    expires?: number; // Default: 7 days
     sameSite?: 'Strict' | 'Lax' | 'None';
   };
 
   // Refresh token (separate storage)
   refreshToken?: {
-    tokenKey?: string;               // Default: 'refreshToken'
+    tokenKey?: string; // Default: 'refreshToken'
     storage?: 'cookie' | 'localStorage' | 'sessionStorage';
-    cookieOptions?: { /* same as above */ }; // Default: 30 days
+    cookieOptions?: {
+      /* same as above */
+    }; // Default: 30 days
   };
 }
 ```
@@ -282,7 +282,7 @@ Update multiple caches at once:
 ```typescript
 const cache = new QueryCacheManager({
   queryKey: [
-    ['users'],              // All users
+    ['users'], // All users
     ['users', { page: 1 }], // Page 1
     ['users', { page: 2 }], // Page 2
   ],
@@ -304,10 +304,7 @@ cache.create(newUser, 'start'); // Add to beginning
 cache.update({ id: '1', name: 'Updated' });
 
 // Update with custom matcher
-cache.update(
-  { status: 'active' },
-  (user) => user.email === 'test@example.com'
-);
+cache.update({ status: 'active' }, (user) => user.email === 'test@example.com');
 
 // Delete
 cache.delete('user-id');
@@ -323,6 +320,7 @@ cache.invalidate();
 ### Data Structures
 
 **Paginated:**
+
 ```typescript
 const cache = new QueryCacheManager({
   queryKey: ['users'],
@@ -333,6 +331,7 @@ const cache = new QueryCacheManager({
 ```
 
 **Array:**
+
 ```typescript
 const cache = new QueryCacheManager({
   queryKey: ['products'],
@@ -342,6 +341,7 @@ const cache = new QueryCacheManager({
 ```
 
 **Single Item:**
+
 ```typescript
 const cache = new QueryCacheManager({
   queryKey: ['profile', userId],
@@ -351,88 +351,10 @@ const cache = new QueryCacheManager({
 });
 ```
 
----
-
-## 📱 Phone Utilities
-
-```typescript
-import {
-  cleanPhone,
-  formatPhone,
-  isValidPhone,
-  parsePhone,
-  maskPhone,
-  toE164,
-  toTelLink,
-} from 'servios';
-
-// Clean
-cleanPhone('+1 (555) 123-4567'); // '15551234567'
-
-// Format
-formatPhone('5551234567'); // '(555) 123-4567'
-formatPhone('15551234567'); // '+1 (555) 123-4567'
-
-// Validate
-isValidPhone('555-123-4567'); // true
-isValidPhone('12345'); // false
-
-// Parse
-parsePhone('+1 (555) 123-4567');
-// { countryCode: '1', areaCode: '555', number: '1234567', full: '15551234567' }
-
-// Mask
-maskPhone('555-123-4567'); // '(555) ***-4567'
-
-// E.164 format
-toE164('555-123-4567', '1'); // '+15551234567'
-
-// Tel link
-toTelLink('555-123-4567'); // 'tel:+15551234567'
-```
-
----
-
-## 🔐 Token Management
-
-### Default Behavior
-
-If you don't provide token handlers, built-in utilities are used:
-- **Access Token**: Cookie, `accessToken` key, 7 days, secure
-- **Refresh Token**: Cookie, `refreshToken` key, 30 days, secure
-
-### Custom Token Config
-
-```typescript
-import { configureToken } from 'servios';
-
-configureToken({
-  // Access token
-  tokenKey: 'myAccessToken',
-  storage: 'localStorage',
-
-  // Refresh token (separate storage)
-  refreshToken: {
-    tokenKey: 'myRefreshToken',
-    storage: 'cookie',
-    cookieOptions: {
-      secure: true,
-      expires: 30,
-    },
-  },
-});
-```
-
 ### Manual Token Management
 
 ```typescript
-import {
-  setToken,
-  getToken,
-  removeToken,
-  setRefreshToken,
-  getRefreshToken,
-} from 'servios';
+import { setToken, getToken, removeToken, setRefreshToken, getRefreshToken } from 'servios';
 
 // Access token
 setToken('eyJhbGc...');
@@ -590,9 +512,7 @@ function Users() {
       {data?.users.map((user) => (
         <div key={user.id}>{user.name}</div>
       ))}
-      <button onClick={() => createUser.mutate({ name: 'New User' })}>
-        Add
-      </button>
+      <button onClick={() => createUser.mutate({ name: 'New User' })}>Add</button>
     </div>
   );
 }

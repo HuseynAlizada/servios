@@ -6,11 +6,11 @@ Contributions are welcome! Help make Servios better for everyone.
 
 - HTTP services and utilities
 - React Query helpers
-- Utility functions (phone, date, string, etc.)
 - Bug fixes and improvements
 - Documentation updates
 
 **Requirements:**
+
 - Must be reusable and general-purpose
 - Must include TypeScript types
 - Must work independently or declare dependencies
@@ -42,9 +42,11 @@ Update under `[Unreleased]`:
 ## [Unreleased]
 
 ### Added
+
 - New feature description
 
 ### Fixed
+
 - Bug fix description
 ```
 

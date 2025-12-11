@@ -9,27 +9,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [1.0.3] - 2025-12-11
 
 ### Changed
+
 - Updated documentation for clarity
 - Improved README structure and examples
 
 ## [1.0.2] - 2025-12-11
 
 ### Fixed
+
 - Fixed TypeScript type definitions
 - Improved token storage type safety
 
 ## [1.0.1] - 2025-12-11
 
-### Added
-- Phone utility functions (format, validate, mask, parse, E.164, tel link)
-
 ### Fixed
+
 - Token configuration defaults
 - Build output optimization
 
 ## [1.0.0] - 2025-12-01
 
 ### Added
+
 - Core HTTP client with `ApiService` and `BaseService` classes
 - Zero-config service setup - only `baseURL` required
 - Automatic token refresh on 401 errors
@@ -51,6 +52,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Axios instance access for custom interceptors
 
 ### Documentation
+
 - Comprehensive README with examples
 - API reference documentation
 - Publishing guide
@@ -59,6 +61,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ---
 
 **Legend:**
+
 - `Added` - New features
 - `Changed` - Changes to existing functionality
 - `Deprecated` - Soon-to-be removed features
