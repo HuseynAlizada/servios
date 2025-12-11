@@ -1,98 +1,53 @@
-## 📥 Contributing Guide
+# Contributing
 
-This package is open for contributions from everyone.
-If you want to add new services, hooks, utility functions, or improvements, please follow the rules below so we maintain a clean and stable foundation library.
+Contributions are welcome! Help make Servios better for everyone.
 
-### 🔧 What You Can Contribute
+## What to Contribute
 
-You may contribute:
-
-- API service implementations and abstractions
-- Core service utilities (authentication, caching, providers)
-- Reusable React hooks
-- Pure utility/helper functions
-- Shared constants or small modules
-- Fixes or improvements to existing features
+- HTTP services and utilities
+- React Query helpers
+- Utility functions (phone, date, string, etc.)
+- Bug fixes and improvements
 - Documentation updates
 
-#### Important Requirements
+**Requirements:**
+- Must be reusable and general-purpose
+- Must include TypeScript types
+- Must work independently or declare dependencies
 
-- Each contribution **must work independently** or clearly declare its dependencies.
-- Must be **general-purpose and reusable** across multiple projects.
-- Must include **proper TypeScript types**.
+## How to Contribute
 
-### 🛠 How to Contribute
+1. Fork the repo
+2. Create a branch from `main`
+3. Make your changes
+4. Update `CHANGELOG.md` under `[Unreleased]`
+5. Open a Pull Request
+6. Use **Squash and Merge** when merging
 
-1. Fork the project
-2. Create a new branch from `main`.
-3. Add your service/hook/util/lib following the existing structure.
-4. Write tests if applicable.
-5. Update `CHANGELOG.md` using the correct category.
-6. Open a Pull Request.
-7. PRs must use **Squash and Merge**.
-8. After approval, your PR will be merged and automatically released through CI/CD.
+## Commit Format
 
-### 📝 Commit Message Rules
+Follow [Conventional Commits](https://www.conventionalcommits.org/):
 
-These rules are **required** for the automatic release pipeline to work.
-
-When squashing your PR, the commit message **must** follow Conventional Commits format:
-
-### New Feature / Service / Hook
-
-```sh
-feat: added ApiService base class for HTTP requests
-feat: added useLocalStorage hook
-feat: added token management utilities
+```bash
+feat: add new feature          # Minor version bump
+fix: fix bug                   # Patch version bump
+feat!: breaking change         # Major version bump
 ```
 
-→ triggers a minor version bump
+## CHANGELOG Format
 
-### Bug Fix
+Update under `[Unreleased]`:
 
-```sh
-fix: corrected token refresh logic in axios interceptor
-fix: corrected delay behavior in useDebounce
-```
-
-→ triggers a patch version bump
-
-### Breaking Change
-
-```sh
-feat!: updated ApiService configuration interface
-feat!: updated API for useToggle
-```
-
-→ triggers a major version bump
-
-## Updating the CHANGELOG
-
-Each PR must update CHANGELOG.md:
-
-Use the correct category (Added, Changed, Fixed, etc.)
-Follow the formatting already used in the file
-Keep descriptions short and clear
-
+```markdown
 ## [Unreleased]
 
 ### Added
-
-```sh
-- `ApiService` base class for building HTTP service clients (#42)
-- `useLocalStorage` hook for persisting state in localStorage (#43)
-- Token management utilities with multiple storage options (#44)
-```
+- New feature description
 
 ### Fixed
-
-```sh
-- Fixed race condition in `useDebounce` when value changes rapidly (#45)
-- Fixed token refresh retry logic in axios interceptor (#46)
+- Bug fix description
 ```
 
-### Final Note
+---
 
-Your involvement is highly appreciated!
-The more people contribute, the more powerful and useful this foundation library becomes.
-Let's build something reliable and reusable for modern applications! 🚀
+Thanks for contributing! 🚀

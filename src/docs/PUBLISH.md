@@ -1,94 +1,50 @@
-## Versioning Guide
+# Publishing Guide
 
-This package follows **Semantic Versioning (SemVer)**:
+Quick guide for releasing new versions of Servios.
 
-- **PATCH (`1.0.0 → 1.0.1`)** – Small fixes (bug fixes, typing improvements, documentation updates).
-- **MINOR (`1.0.0 → 1.1.0`)** – New features, hooks, or utilities added **without** breaking the existing API.
-- **MAJOR (`1.1.0 → 2.0.0`)** – Breaking changes (API changes, renamed exports, function signature updates, etc.).
+## Semantic Versioning
 
-### Commands to Bump the Version
+- **PATCH** (`1.0.0 → 1.0.1`) - Bug fixes, docs, types
+- **MINOR** (`1.0.0 → 1.1.0`) - New features (backward compatible)
+- **MAJOR** (`1.0.0 → 2.0.0`) - Breaking changes
 
-#### PATCH bump (bug fix or non-breaking update)
+## Release Steps
 
-```sh
-npm version patch
-```
+1. **Make changes** and test
 
-This command:
-
-- Updates `package.json` version from `x.y.z → x.y.(z+1)`
-- Automatically creates a git commit and a git tag
-
-#### MINOR bump (new hook/utility, no breaking changes)
-
-```sh
-npm version minor
-```
-
-This command:
-
-- Updates `package.json` version from `x.y.z → x.(y+1).0`
-- Creates a git commit + tag
-
-#### MAJOR bump (breaking API change)
-
-```sh
-npm version major
-```
-
-This command:
-
-- Updates `package.json` version from `(x+1).0.0`
-- Creates a git commit + tag
-
-### Release & Publish Workflow
-
-Follow these steps to create a new release:
-
-1. **Make your code changes** - Add a new hook/utility or fix a bug.
-
-2. **Update `CHANGELOG.md`** under the [Unreleased] section:
-
+2. **Update CHANGELOG.md**
    ```markdown
-   ### Feature
+   ## [Unreleased]
 
-   - `useScrollLock` hook added
+   ### Added
+   - New feature description
 
    ### Fixed
-
-   - Fixed focus trap escape key handling
+   - Bug fix description
    ```
 
-3. **Bump the version** according to the type of change:
+3. **Bump version**
+   ```bash
+   npm version patch   # Bug fix
+   npm version minor   # New feature
+   npm version major   # Breaking change
+   ```
 
-   - Bug fix → `npm version patch`
-   - New non-breaking feature → `npm version minor`
-   - Breaking change → `npm version major`
-
-4. **Publish the package**:
-
-   ```sh
+4. **Publish**
+   ```bash
    npm publish --access public
    ```
 
-5. **Finalize the changelog** - Move the content from `[Unreleased]` to the new version section and add the release date.
+5. **Update changelog** - Move `[Unreleased]` to new version with date
 
-### Version Bump Examples
+## Quick Reference
 
-| Change                                | Command             | New Version   |
-| ------------------------------------- | ------------------- | ------------- |
-| Bug fix in `usePortal`                | `npm version patch` | 1.0.0 → 1.0.1 |
-| New hook added (useDisableScroll)     | `npm version minor` | 1.0.0 → 1.1.0 |
-| `useFocusTrap` API changed (breaking) | `npm version major` | 1.1.0 → 2.0.0 |
-
-### Quick Reference
-
-- `PATCH` – Small fixes → `npm version patch`
-- `MINOR` – New, non-breaking features → `npm version minor`
-- `MAJOR` – Breaking changes → `npm version major`
+| Change | Command | Example |
+|--------|---------|---------|
+| Bug fix | `npm version patch` | 1.0.0 → 1.0.1 |
+| New feature | `npm version minor` | 1.0.0 → 1.1.0 |
+| Breaking change | `npm version major` | 1.0.0 → 2.0.0 |
 
 ---
 
-## License
-
-MIT
+That's it! Keep it simple, ship fast 🚀
