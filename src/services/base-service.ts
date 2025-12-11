@@ -168,7 +168,7 @@ export class BaseService {
   private logMock(method: string, url: string, data: any) {
   console.log(
     `MOCK → ${method.toUpperCase()} ${url}`,
-    "color:#4CAF50; font-weight:bold",
+    "color:red",
     data
   );
 }
