@@ -1,6 +1,7 @@
 import { CookieManager, isBrowser } from 'everyday-helper';
 
-import type { TokenConfig, SingleTokenConfig, TokenCookieOptions } from './types';
+import { encryptValue, decryptValue, obfuscateKey } from './crypto';
+import type { TokenConfig, SingleTokenConfig, TokenCookieOptions, EncryptConfig } from './types';
 
 const DEFAULT_ACCESS_TOKEN_KEY = 'accessToken';
 const DEFAULT_REFRESH_TOKEN_KEY = 'refreshToken';
@@ -21,8 +22,17 @@ const DEFAULT_REFRESH_COOKIE_OPTIONS: Required<TokenCookieOptions> = {
   sameSite: 'Strict' as const,
 };
 
-let globalTokenConfig: Required<SingleTokenConfig> & {
-  refreshToken?: Required<SingleTokenConfig>;
+let globalTokenConfig: {
+  tokenKey: string;
+  encrypt?: EncryptConfig;
+  cookieOptions: Required<TokenCookieOptions>;
+  storage: 'cookie' | 'localStorage' | 'sessionStorage';
+  refreshToken?: {
+    tokenKey: string;
+    cookieOptions: Required<TokenCookieOptions>;
+    encrypt?: EncryptConfig;
+    storage: 'cookie' | 'localStorage' | 'sessionStorage';
+  };
 } = {
   storage: 'cookie',
   tokenKey: DEFAULT_ACCESS_TOKEN_KEY,
@@ -42,6 +52,7 @@ export const configureToken = (config: TokenConfig): void => {
       ...DEFAULT_COOKIE_OPTIONS,
       ...config.cookieOptions,
     },
+    encrypt: config.encrypt,
     refreshToken: config.refreshToken
       ? {
           tokenKey: config.refreshToken.tokenKey || DEFAULT_REFRESH_TOKEN_KEY,
@@ -50,6 +61,7 @@ export const configureToken = (config: TokenConfig): void => {
             ...DEFAULT_REFRESH_COOKIE_OPTIONS,
             ...config.refreshToken.cookieOptions,
           },
+          encrypt: config.refreshToken.encrypt,
         }
       : {
           storage: 'cookie',
@@ -59,26 +71,33 @@ export const configureToken = (config: TokenConfig): void => {
   };
 };
 
+const resolveStorageKey = (tokenKey: string, encrypt?: EncryptConfig): string =>
+  encrypt ? obfuscateKey(tokenKey, encrypt) : tokenKey;
+
 const setTokenInStorage = (
   token: string,
   storage: 'cookie' | 'localStorage' | 'sessionStorage',
   tokenKey: string,
   cookieOptions?: TokenCookieOptions,
+  encrypt?: EncryptConfig,
 ): void => {
+  const key = resolveStorageKey(tokenKey, encrypt);
+  const value = encrypt ? encryptValue(token, encrypt) : token;
+
   switch (storage) {
     case 'localStorage':
       if (isBrowser()) {
-        localStorage.setItem(tokenKey, token);
+        localStorage.setItem(key, value);
       }
       break;
     case 'sessionStorage':
       if (isBrowser()) {
-        sessionStorage.setItem(tokenKey, token);
+        sessionStorage.setItem(key, value);
       }
       break;
     case 'cookie':
     default:
-      CookieManager.set(tokenKey, token, {
+      CookieManager.set(key, value, {
         ...DEFAULT_COOKIE_OPTIONS,
         ...cookieOptions,
       });
@@ -89,43 +108,50 @@ const setTokenInStorage = (
 const getTokenFromStorage = (
   storage: 'cookie' | 'localStorage' | 'sessionStorage',
   tokenKey: string,
+  encrypt?: EncryptConfig,
 ): string | null => {
+  const key = resolveStorageKey(tokenKey, encrypt);
+
+  let raw: string | null = null;
+
   switch (storage) {
     case 'localStorage':
-      if (isBrowser()) {
-        return localStorage.getItem(tokenKey) || null;
-      }
-      return null;
+      raw = isBrowser() ? localStorage.getItem(key) : null;
+      break;
     case 'sessionStorage':
-      if (isBrowser()) {
-        return sessionStorage.getItem(tokenKey) || null;
-      }
-      return null;
+      raw = isBrowser() ? sessionStorage.getItem(key) : null;
+      break;
     case 'cookie':
     default:
-      return CookieManager.get(tokenKey);
+      raw = CookieManager.get(key);
   }
+
+  if (!raw) return null;
+  return encrypt ? decryptValue(raw, encrypt) : raw;
 };
 
 const removeTokenFromStorage = (
   storage: 'cookie' | 'localStorage' | 'sessionStorage',
   tokenKey: string,
   cookieOptions?: TokenCookieOptions,
+  encrypt?: EncryptConfig,
 ): void => {
+  const key = resolveStorageKey(tokenKey, encrypt);
+
   switch (storage) {
     case 'localStorage':
       if (isBrowser()) {
-        localStorage.removeItem(tokenKey);
+        localStorage.removeItem(key);
       }
       break;
     case 'sessionStorage':
       if (isBrowser()) {
-        sessionStorage.removeItem(tokenKey);
+        sessionStorage.removeItem(key);
       }
       break;
     case 'cookie':
     default:
-      CookieManager.remove(tokenKey, {
+      CookieManager.remove(key, {
         path: cookieOptions?.path || '/',
       });
       break;
@@ -136,21 +162,21 @@ export const setToken = (token: string, config?: TokenConfig): void => {
   const tokenConfig = config || globalTokenConfig;
   const tokenKey = tokenConfig.tokenKey || DEFAULT_ACCESS_TOKEN_KEY;
   const storage = tokenConfig.storage || 'cookie';
-  setTokenInStorage(token, storage, tokenKey, tokenConfig.cookieOptions);
+  setTokenInStorage(token, storage, tokenKey, tokenConfig.cookieOptions, tokenConfig.encrypt);
 };
 
 export const getToken = (config?: TokenConfig): string | null => {
   const tokenConfig = config || globalTokenConfig;
   const tokenKey = tokenConfig.tokenKey || DEFAULT_ACCESS_TOKEN_KEY;
   const storage = tokenConfig.storage || 'cookie';
-  return getTokenFromStorage(storage, tokenKey);
+  return getTokenFromStorage(storage, tokenKey, tokenConfig.encrypt);
 };
 
 export const removeToken = (config?: TokenConfig): void => {
   const tokenConfig = config || globalTokenConfig;
   const tokenKey = tokenConfig.tokenKey || DEFAULT_ACCESS_TOKEN_KEY;
   const storage = tokenConfig.storage || 'cookie';
-  removeTokenFromStorage(storage, tokenKey, tokenConfig.cookieOptions);
+  removeTokenFromStorage(storage, tokenKey, tokenConfig.cookieOptions, tokenConfig.encrypt);
 };
 
 export const setRefreshToken = (token: string, config?: TokenConfig): void => {
@@ -159,7 +185,7 @@ export const setRefreshToken = (token: string, config?: TokenConfig): void => {
 
   const tokenKey = refreshConfig.tokenKey || DEFAULT_REFRESH_TOKEN_KEY;
   const storage = refreshConfig.storage || 'cookie';
-  setTokenInStorage(token, storage, tokenKey, refreshConfig.cookieOptions);
+  setTokenInStorage(token, storage, tokenKey, refreshConfig.cookieOptions, refreshConfig.encrypt);
 };
 
 export const getRefreshToken = (config?: TokenConfig): string | null => {
@@ -168,7 +194,7 @@ export const getRefreshToken = (config?: TokenConfig): string | null => {
 
   const tokenKey = refreshConfig.tokenKey || DEFAULT_REFRESH_TOKEN_KEY;
   const storage = refreshConfig.storage || 'cookie';
-  return getTokenFromStorage(storage, tokenKey);
+  return getTokenFromStorage(storage, tokenKey, refreshConfig.encrypt);
 };
 
 export const removeRefreshToken = (config?: TokenConfig): void => {
@@ -177,5 +203,5 @@ export const removeRefreshToken = (config?: TokenConfig): void => {
 
   const tokenKey = refreshConfig.tokenKey || DEFAULT_REFRESH_TOKEN_KEY;
   const storage = refreshConfig.storage || 'cookie';
-  removeTokenFromStorage(storage, tokenKey, refreshConfig.cookieOptions);
+  removeTokenFromStorage(storage, tokenKey, refreshConfig.cookieOptions, refreshConfig.encrypt);
 };
