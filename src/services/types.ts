@@ -10,8 +10,13 @@ export interface TokenCookieOptions {
   sameSite?: 'Strict' | 'Lax' | 'None';
 }
 
+export interface EncryptConfig {
+  secret: string;
+}
+
 export interface SingleTokenConfig {
   tokenKey?: string;
+  encrypt?: EncryptConfig;
   cookieOptions?: TokenCookieOptions;
   storage?: 'cookie' | 'localStorage' | 'sessionStorage';
 }
@@ -19,6 +24,7 @@ export interface SingleTokenConfig {
 export interface TokenConfig extends SingleTokenConfig {
   refreshToken?: {
     tokenKey?: string;
+    encrypt?: EncryptConfig;
     cookieOptions?: TokenCookieOptions;
     storage?: 'cookie' | 'localStorage' | 'sessionStorage';
   };
@@ -30,21 +36,19 @@ export interface RequestConfig<T = any> {
   endpoint: string;
   version?: string;
   isMock?: boolean;
+  isPublic?: boolean;
   mockStatus?: number;
   includeHeaders?: boolean;
-  isPublic?: boolean;
   config?: AxiosRequestConfig;
   params?: Record<string, any>;
 }
 
 export interface BaseServiceOptions {
-  baseURL?: string;
-
-  version?: string;
-  serviceName?: string;
   prefix?: string;
-
+  baseURL?: string;
+  version?: string;
   isPublic?: boolean;
+  serviceName?: string;
 
   removeAccessToken?: () => void;
   removeRefreshToken?: () => void;

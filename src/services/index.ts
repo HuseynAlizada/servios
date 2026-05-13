@@ -19,6 +19,7 @@ export { Public, Private } from './decorators';
 export type {
   HttpMethod,
   TokenConfig,
+  EncryptConfig,
   RequestConfig,
   ServiceOverrides,
   BaseServiceOptions,
