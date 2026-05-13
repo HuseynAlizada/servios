@@ -673,6 +673,83 @@ configureToken({
 
 ---
 
+### Encrypted Token Storage
+
+By default tokens are stored in plain text. Enable encryption so that both the **key name** and **value** are unreadable in DevTools — even if someone copies the raw cookie or localStorage entry they cannot use it as a Bearer token.
+
+**How it works under the hood:**
+
+| What | Algorithm | Result |
+|------|-----------|--------|
+| Key name | HMAC-SHA256 (first 24 hex chars) | `accessToken` → `a3f9b2e1c4d7a8f0b3e2` |
+| Value | AES-256 (crypto-js) | `eyJhbGci…` → `U2FsdGVkX1+…` |
+
+`get` / `set` / `remove` all derive the same obfuscated key from `secret`, so lookups are always consistent. Encryption and decryption happen transparently — your app code stays the same.
+
+#### Basic usage
+
+```typescript
+import { configureToken } from 'servios';
+
+configureToken({
+  storage: 'localStorage',
+  encrypt: {
+    secret: 'my-super-secret-32-char-key!!!!!',
+  },
+});
+
+// What you write:
+setToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...');
+
+// What DevTools shows:
+// Key:   a3f9b2e1c4d7a8f0b3e2
+// Value: U2FsdGVkX1+Kj8mN...
+
+// What your app reads back (automatic decryption):
+const token = getToken(); // → "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+```
+
+#### Encrypting access and refresh tokens separately
+
+```typescript
+configureToken({
+  storage: 'localStorage',
+  encrypt: { secret: 'access-token-secret-key-32chars!' },
+
+  refreshToken: {
+    storage: 'cookie',
+    encrypt: { secret: 'refresh-token-secret-key-32chars' },
+  },
+});
+```
+
+#### With `configureBaseService`
+
+```typescript
+configureBaseService({
+  baseURL: 'https://api.example.com',
+
+  tokenConfig: {
+    storage: 'localStorage',
+    encrypt: { secret: import.meta.env.VITE_TOKEN_SECRET },
+
+    refreshToken: {
+      storage: 'cookie',
+      encrypt: { secret: import.meta.env.VITE_TOKEN_SECRET },
+    },
+  },
+
+  async refreshToken() {
+    const res = await fetch('/auth/refresh', { credentials: 'include' });
+    return await res.json();
+  },
+});
+```
+
+> **Note:** `encrypt` is `undefined` by default — no encryption, no breaking changes. Existing code continues to work without any modification.
+
+---
+
 ## 🎭 Mock Support
 
 ### Global Mock (Development)
