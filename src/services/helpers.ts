@@ -134,6 +134,8 @@ export interface InterceptorState {
   }>;
 }
 
+let moduleRefreshPromise: Promise<{ accessToken: string; refreshToken?: string }> | null = null;
+
 export function setupInterceptors(
   api: AxiosInstance,
   options: {
@@ -184,7 +186,15 @@ export function setupInterceptors(
 
           if (!state.isRefreshing) {
             state.isRefreshing = true;
-            options.refreshToken!()
+
+            const isCreator = !moduleRefreshPromise;
+            if (isCreator) {
+              moduleRefreshPromise = options.refreshToken!().finally(() => {
+                moduleRefreshPromise = null;
+              });
+            }
+
+            moduleRefreshPromise!
               .then(({ accessToken, refreshToken }) => {
                 options.setAccessToken(accessToken);
                 if (refreshToken && options.setRefreshToken) {
@@ -196,7 +206,7 @@ export function setupInterceptors(
               .catch((err) => {
                 processQueueInternal(state.failedQueue, api, err);
                 state.failedQueue = [];
-                options.logout();
+                if (isCreator) options.logout();
               })
               .finally(() => (state.isRefreshing = false));
           }
